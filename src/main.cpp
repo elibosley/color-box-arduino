@@ -43,9 +43,10 @@ bool compareArr(int arr1[NUM_LEDS / 2], int arr2[NUM_LEDS / 2])
 
     for (int i = 0; i < (NUM_LEDS / 2); ++i)
     {
-       if (arr1[i] != arr2[i]) {
-           return false;
-       }
+        if (arr1[i] != arr2[i])
+        {
+            return false;
+        }
     }
     return true;
 }
@@ -54,45 +55,84 @@ class Game
 {
 public:
     int currStage = 0;
-    int totalStages = 5;
+    const static int totalStages = 5;
     GameStatus currStatus = NEW;
-    int currLossIterations = 0;
-    int maxLossIterations = 200;
+    bool hasPlayedWinLossAnimation = false;
     // Stages defines each stage. As switches are pressed, currStage is incremented if they match, and reset if they do not
-    int stages[5][NUM_LEDS / 2] = {
+    int stages[totalStages][NUM_LEDS / 2] = {
         {0},
         {0, 0, 0, 1, 0, 0},
         {0, 0, 0, 1, 0, 1},
         {0, 1, 0, 1, 0, 1},
         {0, 1, 1, 1, 0, 1}};
-    GameStatus playRound(int arr [NUM_LEDS / 2])
+    GameStatus playRound(int arr[NUM_LEDS / 2])
     {
-        if (compareArr(stages[currStage], arr) == false) {
-            currStage = 0;
-            currStatus = LOST;
-        } else if (currStage >= totalStages - 1) {
-            currStatus = WON;
-        } else {
+        Serial.print("Status: ");
+        Serial.print(currStatus);
+        Serial.print(" Stage");
+        Serial.println(currStage);
+        if (currStatus == WON || currStatus == LOST)
+        {
+            if (hasPlayedWinLossAnimation)
+            {
+                // Wait to reset until all switches are flipped back down
+                if (compareArr(arr, stages[0]))
+                {
+                    currStatus = NEW;
+                    currStage = 0;
+                    hasPlayedWinLossAnimation = false;
+                }
+            }
+            else
+            {
+                Serial.println("Won or Lost!");
+                playWinLossAnimation(currStatus == WON);
+            }
 
+            return currStatus;
+        }
+        if (currStage >= totalStages)
+        {
+            Serial.print("---- CURR STAGE ----");
+            Serial.print(currStage);
+            Serial.println("Setting to won");
+            currStatus = WON;
+        }
+        else if (compareArr(stages[currStage], arr) == true)
+        {
+            Serial.println("Advancing Stage");
             currStatus = PLAYING;
             currStage += 1;
+        }
+        else if (currStage > 0 && compareArr(stages[currStage - 1], arr) == true)
+        {
+            currStatus = PLAYING;
+        }
+        else
+        {
+            Serial.println("Lost Game");
+            currStatus = LOST;
         }
         return currStatus;
     }
 
-    void playLossAnimation() {
-        if (currStatus == LOST && currLossIterations < maxLossIterations) {
-            if (maxLossIterations % 2 == 0) {
-
+    void playWinLossAnimation(bool won)
+    {
+        CRGB ledColor = won ? CRGB(0, 255, 0) : CRGB(255, 0, 0);
+        if (!hasPlayedWinLossAnimation)
+        {
+            for (int i = 0; i <= NUM_LEDS; i += 2)
+            {
+                leds[i] = ledColor;
+                FastLED.show();
+                delay(150);
             }
-            maxLossIterations += 1;
+            hasPlayedWinLossAnimation = true;
         }
-        
     }
 };
 
-Game *mainGame;
-
+Game mainGame;
 
 int swIdx(int sw)
 {
@@ -121,8 +161,7 @@ CRGB &getLed(int sw)
 
 void setLightForSwitch(int sw, int state)
 {
-    // Off is On
-    if (state == 0)
+    if (state == 1)
     {
         getLed(sw) = colors[swIdx(sw)];
     }
@@ -144,28 +183,28 @@ void setup()
     pinMode(sw4, INPUT_PULLUP);
     pinMode(sw5, INPUT_PULLUP);
     pinMode(sw6, INPUT_PULLUP);
-    mainGame = new Game();
+    mainGame = Game();
 }
 
 void loop()
 {
-    val1 = digitalRead(sw1);
-    val2 = digitalRead(sw2);
-    val3 = digitalRead(sw3);
-    val4 = digitalRead(sw4);
-    val5 = digitalRead(sw5);
-    val6 = digitalRead(sw6);
-    setLightForSwitch(sw1, val1);
-    setLightForSwitch(sw2, val2);
-    setLightForSwitch(sw3, val3);
-    setLightForSwitch(sw4, val4);
-    setLightForSwitch(sw5, val5);
-    setLightForSwitch(sw6, val6);
-    delay(100);
+    val1 = !digitalRead(sw1);
+    val2 = !digitalRead(sw2);
+    val3 = !digitalRead(sw3);
+    val4 = !digitalRead(sw4);
+    val5 = !digitalRead(sw5);
+    val6 = !digitalRead(sw6);
+    if (mainGame.currStatus != WON && mainGame.currStatus != LOST)
+    {
+        setLightForSwitch(sw1, val1);
+        setLightForSwitch(sw2, val2);
+        setLightForSwitch(sw3, val3);
+        setLightForSwitch(sw4, val4);
+        setLightForSwitch(sw5, val5);
+        setLightForSwitch(sw6, val6);
+    }
     int roundVals[NUM_LEDS / 2] = {val1, val2, val3, val4, val5, val6};
-    mainGame->playRound(roundVals);
-    Serial.println(mainGame->currStage);
-    Serial.println(mainGame->currStatus);
+    mainGame.playRound(roundVals);
     value = "";
     value.concat(val1);
     value.concat(", ");
@@ -178,25 +217,5 @@ void loop()
     value.concat(val5);
     value.concat(", ");
     value.concat(val6);
-    // Serial.println(value);
-
-    /*
-    for (int i = 0; i <= NUM_LEDS; i+=2)
-    {
-        leds[i] = CRGB(0, 0, 255);
-        FastLED.show();
-        delay(100);
-  }
-  for (int i = NUM_LEDS; i >= 0; i-=2) {
-    leds[i] = CRGB ( 255, 0, 0);
-    FastLED.show();
     delay(100);
-  }
-    for (int i = 0; i <= NUM_LEDS; i+=2) {
-    leds[i] = CRGB ( 0, 255, 0);
-    FastLED.show();
-    delay(100);
-  } 
-  */
-    // put your main code here, to run repeatedly:
 }
