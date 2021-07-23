@@ -1,0 +1,58 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "/Users/elibosley/OneDrive/Documents/PlatformIO/Projects/Color Box Escape Room/include",
+                "/Users/elibosley/OneDrive/Documents/PlatformIO/Projects/Color Box Escape Room/src",
+                "/Users/elibosley/OneDrive/Documents/PlatformIO/Projects/Color Box Escape Room/.pio/libdeps/uno/FastLED/src",
+                "/Users/elibosley/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "/Users/elibosley/.platformio/packages/framework-arduino-avr/variants/standard",
+                "/Users/elibosley/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "/Users/elibosley/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                "/Users/elibosley/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                "/Users/elibosley/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                "/Users/elibosley/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "/Users/elibosley/OneDrive/Documents/PlatformIO/Projects/Color Box Escape Room/include",
+                    "/Users/elibosley/OneDrive/Documents/PlatformIO/Projects/Color Box Escape Room/src",
+                    "/Users/elibosley/OneDrive/Documents/PlatformIO/Projects/Color Box Escape Room/.pio/libdeps/uno/FastLED/src",
+                    "/Users/elibosley/.platformio/packages/framework-arduino-avr/cores/arduino",
+                    "/Users/elibosley/.platformio/packages/framework-arduino-avr/variants/standard",
+                    "/Users/elibosley/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                    "/Users/elibosley/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                    "/Users/elibosley/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                    "/Users/elibosley/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                    "/Users/elibosley/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=50101",
+                "ARDUINO_AVR_UNO",
+                "F_CPU=16000000L",
+                "ARDUINO_ARCH_AVR",
+                "ARDUINO=10808",
+                "__AVR_ATmega328P__",
+                ""
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "compilerPath": "/Users/elibosley/.platformio/packages/toolchain-atmelavr/bin/avr-gcc",
+            "compilerArgs": [
+                "-mmcu=atmega328p",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}

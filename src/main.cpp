@@ -1,5 +1,24 @@
 #include <Arduino.h>
 #include <FastLed.h>
+#include <Servo.h>
+#include <Buzzer.h>
+
+int melody[] = {
+    NOTE_FS5, NOTE_FS5, NOTE_D5, NOTE_B4, NOTE_B4, NOTE_E5,
+    NOTE_E5, NOTE_E5, NOTE_GS5, NOTE_GS5, NOTE_A5, NOTE_B5,
+    NOTE_A5, NOTE_A5, NOTE_A5, NOTE_E5, NOTE_D5, NOTE_FS5,
+    NOTE_FS5, NOTE_FS5, NOTE_E5, NOTE_E5, NOTE_FS5, NOTE_E5};
+
+// The note duration, 8 = 8th note, 4 = quarter note, etc.
+int durations[] = {
+    8, 8, 8, 4, 4, 4,
+    4, 5, 8, 8, 8, 8,
+    8, 8, 8, 4, 4, 4,
+    4, 5, 8, 8, 8, 8};
+// determine the length of the arrays to use in the loop iteration
+int songLength = sizeof(melody) / sizeof(melody[0]);
+
+#define BUZZER_PIN 5
 
 #define LED_PIN 7
 #define NUM_LEDS 12
@@ -10,6 +29,12 @@
 #define sw4 10
 #define sw5 9
 #define sw6 8
+
+#define SERVO_PIN 6
+#define UNLOCKED 110
+#define LOCKED 30
+
+Servo lockingServo;
 
 int val1;
 int val2;
@@ -51,6 +76,37 @@ bool compareArr(int arr1[NUM_LEDS / 2], int arr2[NUM_LEDS / 2])
     return true;
 }
 
+void lockBox()
+{
+    lockingServo.attach(SERVO_PIN);
+    lockingServo.write(LOCKED);
+    delay(200);
+    lockingServo.detach();
+}
+
+void unlockBox()
+{
+    lockingServo.attach(SERVO_PIN);
+    lockingServo.write(UNLOCKED);
+    delay(200);
+    lockingServo.detach();
+}
+
+void wonSong() {
+    for (int thisNote = 0; thisNote < songLength; thisNote++)
+    {
+        // determine the duration of the notes that the computer understands
+        // divide 1000 by the value, so the first note lasts for 1000/8 milliseconds
+        int duration = 1000 / durations[thisNote];
+        tone(BUZZER_PIN, melody[thisNote], duration);
+        // pause between notes
+        int pause = duration * 1.3;
+        delay(pause);
+        // stop the tone
+        noTone(8);
+    }
+}
+
 class Game
 {
 public:
@@ -80,12 +136,17 @@ public:
                 {
                     currStatus = NEW;
                     currStage = 0;
+                    lockBox();
                     hasPlayedWinLossAnimation = false;
                 }
             }
             else
             {
                 Serial.println("Won or Lost!");
+                if (currStatus == WON)
+                {
+                    unlockBox();
+                }
                 playWinLossAnimation(currStatus == WON);
             }
 
@@ -126,6 +187,9 @@ public:
                 leds[i] = ledColor;
                 FastLED.show();
                 delay(150);
+            }
+            if (won) {
+                wonSong();
             }
             hasPlayedWinLossAnimation = true;
         }
@@ -183,6 +247,7 @@ void setup()
     pinMode(sw4, INPUT_PULLUP);
     pinMode(sw5, INPUT_PULLUP);
     pinMode(sw6, INPUT_PULLUP);
+    lockBox();
     mainGame = Game();
 }
 
