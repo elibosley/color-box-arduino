@@ -4,17 +4,11 @@
 #include <Buzzer.h>
 
 int melody[] = {
-    NOTE_FS5, NOTE_FS5, NOTE_D5, NOTE_B4, NOTE_B4, NOTE_E5,
-    NOTE_E5, NOTE_E5, NOTE_GS5, NOTE_GS5, NOTE_A5, NOTE_B5,
-    NOTE_A5, NOTE_A5, NOTE_A5, NOTE_E5, NOTE_D5, NOTE_FS5,
-    NOTE_FS5, NOTE_FS5, NOTE_E5, NOTE_E5, NOTE_FS5, NOTE_E5};
+    NOTE_AS4, NOTE_AS4, NOTE_AS4, NOTE_DS5};
 
 // The note duration, 8 = 8th note, 4 = quarter note, etc.
 int durations[] = {
-    8, 8, 8, 4, 4, 4,
-    4, 5, 8, 8, 8, 8,
-    8, 8, 8, 4, 4, 4,
-    4, 5, 8, 8, 8, 8};
+    8, 8, 8,2};
 // determine the length of the arrays to use in the loop iteration
 int songLength = sizeof(melody) / sizeof(melody[0]);
 
@@ -74,6 +68,16 @@ bool compareArr(int arr1[NUM_LEDS / 2], int arr2[NUM_LEDS / 2])
         }
     }
     return true;
+}
+
+bool arrHas4SwitchesFlipped(int arr[NUM_LEDS / 2]) {
+    int count = 0;
+    for (int i = 0; i < (NUM_LEDS / 2); ++i) {
+        if (arr[i] == 1) {
+            count++;
+        }
+    }
+    return count >= 4;
 }
 
 void lockBox()
@@ -169,7 +173,7 @@ public:
         {
             currStatus = PLAYING;
         }
-        else
+        else if (arrHas4SwitchesFlipped(arr))
         {
             Serial.println("Lost Game");
             currStatus = LOST;
