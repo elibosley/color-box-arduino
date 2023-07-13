@@ -4,7 +4,8 @@
 #include <Buzzer.h>
 
 int melody[] = {
-    NOTE_AS4, NOTE_AS4, NOTE_AS4, NOTE_DS5};
+    NOTE_AS4, NOTE_AS4, NOTE_AS4, NOTE_DS5
+    };
 
 // The note duration, 8 = 8th note, 4 = quarter note, etc.
 int durations[] = {
@@ -42,12 +43,23 @@ String value = "";
 CRGB leds[NUM_LEDS];
 
 CRGB colors[NUM_LEDS / 2] = {
-    CRGB(255, 0, 240),
-    CRGB(50, 0, 255),
-    CRGB(79, 204, 41),
-    CRGB(255, 5, 5),
+    CRGB(255, 255, 255),
+    CRGB(75, 0, 181),
+    CRGB(10, 255, 10),
+    CRGB(255, 0, 0),
     CRGB(255, 230, 0),
-    CRGB(15, 0, 219)};
+    CRGB(0, 0, 255)
+};
+
+CRGB dimmed_colors[NUM_LEDS / 2] = {
+    CRGB(20, 20, 20),
+    CRGB(18, 0, 45),
+    CRGB(3, 25, 3),
+    CRGB(20, 0, 0),
+    CRGB(15, 15, 0),
+    CRGB(0, 0, 30)
+};
+
 
 enum GameStatus
 {
@@ -115,16 +127,17 @@ class Game
 {
 public:
     int currStage = 0;
-    const static int totalStages = 5;
+    const static int totalStages = 6;
     GameStatus currStatus = NEW;
     bool hasPlayedWinLossAnimation = false;
     // Stages defines each stage. As switches are pressed, currStage is incremented if they match, and reset if they do not
     int stages[totalStages][NUM_LEDS / 2] = {
         {0},
-        {0, 0, 0, 1, 0, 0},
-        {0, 0, 0, 1, 0, 1},
-        {0, 1, 0, 1, 0, 1},
-        {0, 1, 1, 1, 0, 1}};
+        {0, 0, 1, 0, 0, 0},
+        {0, 0, 1, 0, 1, 0},
+        {0, 0, 1, 0, 1, 1},
+        {0, 0, 1, 1, 1, 1},
+        {0, 1, 1, 1, 1, 1}};
     GameStatus playRound(int arr[NUM_LEDS / 2])
     {
         Serial.print("Status: ");
@@ -235,7 +248,7 @@ void setLightForSwitch(int sw, int state)
     }
     else
     {
-        getLed(sw) = CRGB(0, 0, 0);
+        getLed(sw) = dimmed_colors[swIdx(sw)];
     }
 
     FastLED.show();
